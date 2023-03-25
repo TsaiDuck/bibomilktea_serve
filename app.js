@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // 路由
 app.use('/', indexRouter)
-app.use('/users', usersRouter)
+app.use(usersRouter)
 app.use(testRouter)
 app.use(goodsRouter)
 
