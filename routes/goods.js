@@ -3,22 +3,13 @@ var express = require('express')
 var router = express.Router()
 
 router.get('/api/goodlist', function (req, res) {
-  console.log(req.body.name)
-  res.json({
-    msg: 'ok'
-  })
-  const result = {}
-  result.name = req.body.name
-  result.age = req.body.age
-  console.log('result')
-  console.log(result)
   DB('select * from goods', function (err, result) {
     if (err) {
       console.log(err.message)
     } else {
       console.log('ok')
       console.log(result)
-      res.send('ok')
+      res.json({ msg: 'ok' })
     }
   })
 })
