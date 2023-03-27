@@ -20,7 +20,6 @@ const connectionDB = (sql, params, cb) => {
       console.log('数据库连接失败')
       return
     }
-    console.log('数据库连接成功')
     connection.query(sql, params, cb)
   })
 }

@@ -2,14 +2,24 @@ const DB = require('../db/connection')
 var express = require('express')
 var router = express.Router()
 
+// 获取商品列表
 router.get('/api/goodlist', function (req, res) {
   DB('select * from goods', function (err, result) {
     if (err) {
-      console.log(err.message)
+      res.send({
+        meta: {
+          status: 201,
+          msg: 'fail'
+        }
+      })
     } else {
-      console.log('ok')
-      console.log(result)
-      res.json({ msg: 'ok' })
+      res.send({
+        data: result,
+        meta: {
+          status: 200,
+          msg: 'get goodlist ok'
+        }
+      })
     }
   })
 })
