@@ -24,6 +24,7 @@ router.get('/api/goodlist', function (req, res) {
   })
 })
 
+// 增加商品
 router.post('/api/addgood', function (req, res) {
   const good = {}
   console.log(req.body)
