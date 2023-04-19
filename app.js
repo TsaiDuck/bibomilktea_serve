@@ -1,20 +1,27 @@
 var createError = require('http-errors')
 var express = require('express')
+const expressWs = require('express-ws')
 var path = require('path')
 var cookieParser = require('cookie-parser')
 var logger = require('morgan')
+const cors = require('cors') //使用const cors=require(’cors‘)导入中间件
 
 var indexRouter = require('./routes/index')
 var usersRouter = require('./routes/users')
 var goodsRouter = require('./routes/goods')
 var orderRouter = require('./routes/order')
+var socketRouter = require('./routes/socket')
 
 var app = express()
+expressWs(app)
+app.use(cors()) //在路由之前调用app.use(cors())配置中间件
 
 // 跨域设置
 app.all('*', function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  // res.setHeader("Access-Control-Allow-Origin", req.get("Origin")); // 添加这一行代码，代理配置不成功
+  // res.setHeader('Access-Control-Allow-Credentials', true)
+  // res.setHeader('Access-Control-Allow-Origin', req.get('Origin')) // 添加这一行代码，代理配置不成功
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
   res.setHeader(
     'Access-Control-Allow-Methods',
     'POST, GET, OPTIONS, DELETE, PUT'
@@ -41,6 +48,7 @@ app.use('/', indexRouter)
 app.use(usersRouter)
 app.use(goodsRouter)
 app.use(orderRouter)
+app.use(socketRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

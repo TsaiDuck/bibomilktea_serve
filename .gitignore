@@ -2,7 +2,7 @@
 node_modules/
 unpackage/
 dist/
-
+certificate/
 # local env files
 .env.local
 .env.*.local

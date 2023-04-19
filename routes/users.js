@@ -7,7 +7,7 @@ var router = express.Router()
 // 获取登录页面背景图
 router.get('/api/user/bg', function (req, res) {
   res.send({
-    data: { bgURL: 'http://1.12.227.13:3000/milktea/00245-3553923336-.png' },
+    data: { bgURL: 'https://www.tsaiduck.cn/milktea/00245-3553923336-.png' },
     meta: {
       status: 200,
       msg: 'ok'
@@ -22,23 +22,43 @@ router.post('/api/user/register', function (req, res) {
     user_phone: req.body.user_phone,
     user_pwd: req.body.user_pwd
   }
-  const sql =
-    "insert into users(user_phone,user_pwd)values ('" +
-    user.user_phone +
-    "','" +
-    user.user_pwd +
-    "')"
-  DB(sql, function (err, result) {
+  let sql = `select * from users where user_phone = '${user.user_phone}'`
+  DB(sql, (err, result) => {
     if (err) {
-      console.log(err.message)
-    } else {
-      console.log('DBok')
-      console.log(result)
+      console.log(err)
       res.send({
-        data: {},
         meta: {
-          status: 200,
-          msg: 'ok'
+          status: 500,
+          msg: '数据库错误'
+        }
+      })
+    } else if (result.length !== 0) {
+      res.send({
+        meta: {
+          status: 201,
+          msg: '账号已被注册'
+        }
+      })
+    } else {
+      sql =
+        "insert into users(user_phone,user_pwd)values ('" +
+        user.user_phone +
+        "','" +
+        user.user_pwd +
+        "')"
+      DB(sql, function (err, result) {
+        if (err) {
+          console.log(err.message)
+        } else {
+          console.log('DBok')
+          console.log(result)
+          res.send({
+            data: {},
+            meta: {
+              status: 200,
+              msg: 'ok'
+            }
+          })
         }
       })
     }
@@ -63,8 +83,6 @@ router.post('/api/user/login', function (req, res) {
         }
       })
     } else {
-      console.log('DBok')
-      console.log(result[0])
       if (result.length !== 0) {
         const user = {
           user_id: result[0].user_id,

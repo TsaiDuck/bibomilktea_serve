@@ -1,8 +1,9 @@
 const DB = require('../db/connection')
 var express = require('express')
 var router = express.Router()
+const ws = require('../socket/socketio')
 
-// 添加订单接口
+// 添加订单
 router.post('/api/addorder', function (req, res) {
   const order = req.body
   const now = new Date()
@@ -115,6 +116,9 @@ router.post('/api/addorder', function (req, res) {
         })
       }
       console.log('add order ok')
+      ws.clients.forEach((socket) => {
+        socket.emit('newOrder', '新订单')
+      })
       res.send({
         meta: {
           status: 200,
@@ -361,4 +365,57 @@ router.get('/api/get/order/history', (req, res) => {
     }
   })
 })
+
+// 分页获取所有订单
+router.post('/api/get/allOrder', (req, res) => {
+  let sql = `SELECT * FROM bibo_milktea.order limit ${
+    (req.body.page - 1) * 10
+  },${req.body.limit}`
+  DB(sql, (err, result) => {
+    if (err) {
+      console.log(err)
+      res.send({
+        meta: {
+          status: 501,
+          msg: '数据库错误'
+        }
+      })
+      return
+    } else {
+      res.send({
+        meta: {
+          status: 200,
+          msg: 'ok'
+        },
+        data: result
+      })
+    }
+  })
+})
+
+// 根据订单号查找订单
+router.get('/api/get/order/orderid', (req, res) => {
+  const order_id = req.query.order_id
+  let sql = `SELECT * FROM bibo_milktea.order where order_id like '${order_id}%'`
+  DB(sql, (err, result) => {
+    if (err) {
+      res.send({
+        meta: {
+          status: 501,
+          msg: '数据库错误'
+        }
+      })
+      return
+    } else {
+      res.send({
+        meta: {
+          status: 200,
+          msg: 'ok'
+        },
+        data: result
+      })
+    }
+  })
+})
+
 module.exports = router
