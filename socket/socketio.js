@@ -19,13 +19,13 @@ socketio.getSocketio = function (server) {
     }
     console.log(`user connected 当前连接数：${socketio.clients.length}`)
     socket.on('disconnect', () => {
-      console.log('user close')
       socketio.clients.splice(
         socketio.clients.findIndex(
           (item) => item.handshake.address === socket.handshake.address
         ),
         1
       )
+      console.log(`user close 当前连接数：${socketio.clients.length}`)
     })
   })
 }

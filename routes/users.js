@@ -3,7 +3,6 @@ const DB = require('../db/connection')
 var express = require('express')
 var router = express.Router()
 
-/* GET users listing. */
 // 获取登录页面背景图
 router.get('/api/user/bg', function (req, res) {
   res.send({
