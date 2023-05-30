@@ -12,6 +12,7 @@ var usersRouter = require('./routes/users')
 var goodsRouter = require('./routes/goods')
 var orderRouter = require('./routes/order')
 var socketRouter = require('./routes/socket')
+var materialRouter = require('./routes/material')
 
 var app = express()
 expressWs(app)
@@ -56,6 +57,7 @@ app.use(usersRouter)
 app.use(goodsRouter)
 app.use(orderRouter)
 app.use(socketRouter)
+app.use(materialRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res) {

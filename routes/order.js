@@ -2,6 +2,10 @@ const DB = require('../db/connection')
 var express = require('express')
 var router = express.Router()
 const ws = require('../socket/socketio')
+const axios = require('axios')
+
+// 临时存储订单对象
+let temp = []
 
 // 添加订单
 router.post('/api/addorder', function (req, res) {
@@ -114,6 +118,24 @@ router.post('/api/addorder', function (req, res) {
             return
           }
         })
+        sql =
+          'UPDATE `bibo_milktea`.`goods` SET `good_sell` = (`good_sell` + ' +
+          order.cart[i].count +
+          ") WHERE (`good_id` = '" +
+          order.cart[i].good_id +
+          "');"
+        DB(sql, (err4) => {
+          if (err4) {
+            console.log(err4)
+            res.send({
+              meta: {
+                status: 501,
+                message: '数据库发生问题'
+              }
+            })
+            return
+          }
+        })
       }
       console.log('add order ok')
       ws.clients.forEach((socket) => {
@@ -127,6 +149,16 @@ router.post('/api/addorder', function (req, res) {
       })
     }
   )
+  if (order.order_state == '待支付') {
+    temp.push({
+      order_id,
+      timer: setTimeout(() => {
+        axios.get(
+          `https://www.tsaiduck.cn/api/update/order?order_id=${order_id}&order_state=已取消`
+        )
+      }, 900000)
+    })
+  }
 })
 
 // 根据用户id获取订单
@@ -180,6 +212,31 @@ router.get('/api/update/order', (req, res) => {
           msg: 'ok'
         }
       })
+      if (order_state == '已下单') {
+        temp.forEach((item) => {
+          if (item.order_id == order_id) {
+            item.timer = null
+          }
+        })
+        temp.splice(
+          temp.findIndex((item) => (item.order_id = order_id)),
+          1
+        )
+        ws.clients.forEach((socket) => {
+          socket.emit('newOrder', '新订单')
+        })
+      }
+      if (order_state == '已取消') {
+        temp.forEach((item) => {
+          if (item.order_id == order_id) {
+            item.timer = null
+          }
+          temp.splice(
+            temp.findIndex((item) => (item.order_id = order_id)),
+            1
+          )
+        })
+      }
     }
   })
 })
